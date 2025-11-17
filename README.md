@@ -128,7 +128,3 @@ BroadcastReceiver for alarm handling
 Foreground-safe notification delivery
 
 Made with ❤️ using Jetpack Compose
-
-AlarmManager - Precise notification scheduling
-
-MVVM Architecture - Clean separation of concerns
