@@ -198,7 +198,7 @@ fun NotificationItemPreview() {
             notification = NotificationConfig(
                 id = "1",
                 type = "Daily Reminder",
-                time = "09:00 AM",
+                time = "09:00",
                 repeatInterval = "Every day",
                 message = "Don't forget to check your daily tasks!",
                 deepLink = "home",
@@ -237,7 +237,7 @@ fun NotificationsScreenPreview() {
                 NotificationConfig(
                     id = "1",
                     type = "Daily Reminder",
-                    time = "09:00 AM",
+                    time = "09:00",
                     repeatInterval = "Every day",
                     message = "Don't forget to check your daily tasks!",
                     deepLink = "home",
@@ -246,7 +246,7 @@ fun NotificationsScreenPreview() {
                 NotificationConfig(
                     id = "2",
                     type = "Weekly Summary",
-                    time = "Monday 6:00 PM",
+                    time = "Monday 6:00",
                     repeatInterval = "Weekly",
                     message = "Your weekly progress report is ready",
                     deepLink = "analytics",
@@ -264,7 +264,7 @@ fun NotificationsScreenPreview() {
                 NotificationConfig(
                     id = "4",
                     type = "Tips & Tricks",
-                    time = "3:00 PM",
+                    time = "3:00",
                     repeatInterval = "Twice a week",
                     message = "Learn something new with our pro tips",
                     deepLink = "home",

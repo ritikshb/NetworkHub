@@ -4,4 +4,6 @@
     <string name="schedule">Schedule</string>
     <string name="analytics">Analytics</string>
     <string name="manage_app_notification">Manage your app notification</string>
+    <string name="engagement_today">Engagement Today</string>
+    <string name="total_clicks">Total Clicks</string>
 </resources>

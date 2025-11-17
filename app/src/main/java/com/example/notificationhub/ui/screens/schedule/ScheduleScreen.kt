@@ -1,5 +1,6 @@
 package com.example.notificationhub.ui.screens.schedule
 
+import android.R
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -13,7 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -178,7 +181,7 @@ fun ScheduleScreenContent(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Send,
+                            imageVector = Icons.Default.DoubleArrow,
                             contentDescription = null,
                             tint = Color(0xFF00BCD4)
                         )
@@ -280,7 +283,7 @@ fun TimeField(
         modifier = Modifier.fillMaxWidth(),
         trailingIcon = {
             Icon(
-                imageVector = Icons.Default.Build,
+                imageVector = Icons.Default.AccessAlarm,
                 contentDescription = null,
                 tint = Color.White
             )

@@ -39,7 +39,7 @@ class NotificationHubApplication : Application() {
                         NotificationConfig(
                             id = AppConstant.ID_DAILY_REMINDER,
                             type = AppConstant.TYPE_DAILY_REMINDER,
-                            time = "9:00 AM",
+                            time = "9:00 ",
                             repeatInterval = "Every day",
                             message = AppConstant.DEFAULT_MESSAGE_DAILY,
                             deepLink = AppConstant.DEEP_LINK_NOTIFICATIONS,
@@ -48,7 +48,7 @@ class NotificationHubApplication : Application() {
                         NotificationConfig(
                             id = AppConstant.ID_WEEKLY_SUMMARY,
                             type = AppConstant.TYPE_WEEKLY_SUMMARY,
-                            time = "Monday 6:00 PM",
+                            time = "Monday 6:00 ",
                             repeatInterval = "Weekly",
                             message = AppConstant.DEFAULT_MESSAGE_WEEKLY,
                             deepLink = AppConstant.DEEP_LINK_NOTIFICATIONS,
@@ -66,7 +66,7 @@ class NotificationHubApplication : Application() {
                         NotificationConfig(
                             id = AppConstant.ID_TIPS_TRICKS,
                             type = AppConstant.TYPE_TIPS_TRICKS,
-                            time = "3:00 PM",
+                            time = "3:00 ",
                             repeatInterval = "Twice a week",
                             message = AppConstant.DEFAULT_MESSAGE_TIPS,
                             deepLink = AppConstant.DEEP_LINK_NOTIFICATIONS,
