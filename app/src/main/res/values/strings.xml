@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Notification Hub</string>
+    <string name="notifications">Notifications</string>
+    <string name="schedule">Schedule</string>
+    <string name="analytics">Analytics</string>
+    <string name="manage_app_notification">Manage your app notification</string>
+</resources>
