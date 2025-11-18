@@ -36,7 +36,7 @@ Open the project in Android Studio.
 
 - **Signed APK:** [APK Link](https://drive.google.com/drive/folders/1dgkoSy-GxFr5eU_Qmc6ZV_iTvPXZgVvS?usp=sharing)
 
-- **Demo Video:** [Demo Video Link](https://drive.google.com/drive/folders/1faqSMEYRwyiZfDdmz2dDr6oQFZQnOe_L?usp=sharing)
+- **Technical Document:** [Technical Document Link](https://docs.google.com/document/d/1slVAuayhJNVIDbq-hrvZ5_5uvs0ECG6Ip-S96l8yeHw/edit?usp=sharing)
 
 ---
 
