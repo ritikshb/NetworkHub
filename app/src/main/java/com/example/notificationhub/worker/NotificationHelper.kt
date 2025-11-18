@@ -17,8 +17,18 @@ import com.example.notificationhub.data.entity.NotificationConfig
 import com.example.notificationhub.util.AppConstant
 import java.util.concurrent.TimeUnit
 
+/**
+ * Helper object for managing notification channels,
+ * scheduling and cancelling notifications using WorkManager,
+ * and sending immediate or test notifications.
+ */
 object NotificationHelper {
 
+    /**
+     * Creates the notification channel required on Android O and above.
+     *
+     * @param context Application context for creating the channel
+     */
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -31,76 +41,39 @@ object NotificationHelper {
                 enableVibration(true)
             }
 
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }
 
-    fun scheduleNotification(context: Context, config: NotificationConfig) {
-        val data = workDataOf(
-            "id" to config.id,
-            "title" to config.type,
-            "message" to config.message,
-            "deepLink" to config.deepLink
-        )
 
-        val repeatInterval = when (config.repeatInterval.lowercase()) {
-            "daily", "every day" -> 24L
-            "weekly" -> 168L
-            "twice a week" -> 84L
-            else -> 24L
-        }
-
-        val workRequest = PeriodicWorkRequestBuilder<NotificationWorker>(
-            repeatInterval, TimeUnit.HOURS,
-            15, TimeUnit.MINUTES
-        )
-            .setInputData(data)
-            .addTag(config.id)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiresBatteryNotLow(false)
-                    .build()
-            )
-            .build()
-
-        WorkManager.getInstance(context)
-            .enqueueUniquePeriodicWork(
-                config.id,
-                ExistingPeriodicWorkPolicy.REPLACE,
-                workRequest
-            )
-    }
-
-    fun cancelNotification(context: Context, id: String) {
-        WorkManager.getInstance(context).cancelUniqueWork(id)
-    }
-
-    fun sendTestNotification(context: Context, title: String, message: String, deepLink: String = "home") {
-        val data = workDataOf(
-            "title" to title,
-            "message" to message,
-            "deepLink" to deepLink
-        )
-
-        val workRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
-            .setInputData(data)
-            .build()
-
-        WorkManager.getInstance(context).enqueue(workRequest)
-    }
-
+    /**
+     * Sends a test notification immediately.
+     * Requires POST_NOTIFICATIONS permission on Android 13+.
+     *
+     * @param context Application context
+     */
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     fun sendTestNotificationImmediate(context: Context) {
         showNotification(
             context = context,
             title = "Test Notification",
             message = "This is a test notification from Notification Hub!",
-            deepLink = "notifications",  // Changed from "home"
+            deepLink = "notifications",
             notificationType = "Test Notification"
         )
     }
 
+    /**
+     * Shows a notification immediately using NotificationManagerCompat.
+     *
+     * @param context Application context
+     * @param title Notification title
+     * @param message Notification message
+     * @param deepLink Deep link URI string to open on notification tap
+     * @param notificationType Notification type for analytics (defaults to title)
+     */
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private fun showNotification(
         context: Context,

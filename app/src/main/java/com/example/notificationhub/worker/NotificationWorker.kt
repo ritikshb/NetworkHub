@@ -1,11 +1,9 @@
 package com.example.notificationhub.worker
 
-import android.Manifest
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
@@ -17,11 +15,25 @@ import com.example.notificationhub.util.AppConstant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+/**
+ * WorkManager CoroutineWorker responsible for showing notifications.
+ * It retrieves notification data from input parameters,
+ * displays the notification, and tracks the sent event in the database.
+ *
+ * @property context Application context provided by WorkManager
+ * @property params WorkerParameters containing input data for the notification
+ */
 class NotificationWorker(
     context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
+    /**
+     * Main work execution method called by WorkManager.
+     * Retrieves input data, shows the notification, and tracks analytics.
+     *
+     * @return Result.success() if work completed successfully, else Result.failure()
+     */
     override suspend fun doWork(): Result {
         return try {
             val title = inputData.getString("title") ?: "Notification Hub"
@@ -29,7 +41,6 @@ class NotificationWorker(
             val deepLink = inputData.getString("deepLink") ?: "home"
 
             showNotification(title, message, deepLink)
-
             trackNotificationSent(title)
 
             Result.success()
@@ -39,6 +50,13 @@ class NotificationWorker(
         }
     }
 
+    /**
+     * Displays a notification immediately using NotificationManagerCompat.
+     *
+     * @param title Notification title text
+     * @param message Notification message content
+     * @param deepLink Deep link URI path to open when notification is tapped
+     */
     private fun showNotification(title: String, message: String, deepLink: String) {
         try {
             val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -73,6 +91,11 @@ class NotificationWorker(
         }
     }
 
+    /**
+     * Records the notification sent event in the database for analytics.
+     *
+     * @param notificationType The type or title of the notification sent
+     */
     private suspend fun trackNotificationSent(notificationType: String) {
         withContext(Dispatchers.IO) {
             try {

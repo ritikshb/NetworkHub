@@ -15,6 +15,16 @@ icon_version = "1.9.4"
 lifecycleLivedataKtx = "2.9.4"
 workRuntimeKtx = "2.11.0"
 materialIcon = "1.5.4"
+junitExt = "1.1.5"
+espresso = "3.5.1"
+mockito = "5.3.1"
+mockitoKotlin = "5.1.0"
+archCoreTesting = "2.2.0"
+coroutinesTest = "1.7.3"
+turbine = "1.0.0"
+roomTesting = "2.6.1"
+junitKtx = "1.3.0"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -39,9 +49,31 @@ navigation = { group = "androidx.navigation", name = "navigation-compose" , vers
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
 material-icon = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIcon" }
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
+androidx-arch-core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "archCoreTesting" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "roomTesting" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = {id = "com.google.devtools.ksp", version.ref = "ksp_version" }
+
+[bundles]
+unit-testing = [
+    "junit",
+    "mockito-core",
+    "mockito-kotlin",
+    "androidx-arch-core-testing",
+    "kotlinx-coroutines-test",
+    "turbine"
+]
+
+instrumented-testing = [
+    "androidx-junit",
+    "androidx-room-testing"
+]

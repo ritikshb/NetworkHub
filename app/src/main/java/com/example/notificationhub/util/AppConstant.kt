@@ -44,18 +44,17 @@ object AppConstant {
     const val REPEAT_DAILY = "Daily"
     const val REPEAT_WEEKLY = "Weekly"
     const val REPEAT_TWICE_WEEKLY = "Twice a week"
+    const val EVERY_DAY = "Every day"
 
     // Default Times
     const val DEFAULT_TIME_DAILY = "09:00"
     const val DEFAULT_TIME_WEEKLY = "18:00"
     const val DEFAULT_TIME_TIPS = "15:00"
 
-    // SharedPreferences Keys (if you want to add preferences later)
-    const val PREFS_NAME = "notification_hub_prefs"
-    const val PREF_FIRST_LAUNCH = "first_launch"
-
     // Database
     const val DATABASE_NAME = "notification_hub_db"
     const val DATABASE_VERSION = 1
+
+    const val CLICKED = "clicked"
 }
 

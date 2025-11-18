@@ -6,4 +6,18 @@
     <string name="manage_app_notification">Manage your app notification</string>
     <string name="engagement_today">Engagement Today</string>
     <string name="total_clicks">Total Clicks</string>
+    <string name="engagement_rate">Engagement Rate</string>
+    <string name="clicks_by_type">Clicks by Type</string>
+    <string name="daily_reminder">Daily Reminder</string>
+    <string name="weekly_summary">Weekly Summary</string>
+    <string name="special_offers">Special Offers</string>
+    <string name="best_engagement_time">Best Engagement Time</string>
+    <string name="send_test_notification">Send Test Notification</string>
+    <string name="notification_saved_successfully">Notification saved successfully!</string>
+    <string name="test_notification_sent">Test notification sent!</string>
+    <string name="monday_6_00_pm">Monday 6:00</string>
+    <string name="random_times">Random times</string>
+    <string name="disabled">Disabled</string>
+    <string name="_3_00_pm">3:00</string>
+    <string name="don_t_forget_to_check_your_daily_tasks">Don\'t forget to check your daily tasks!</string>
 </resources>

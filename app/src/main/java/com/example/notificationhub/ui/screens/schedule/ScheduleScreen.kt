@@ -1,8 +1,9 @@
 package com.example.notificationhub.ui.screens.schedule
 
-import android.R
 import android.widget.Toast
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,18 +13,25 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.notificationhub.R
+import com.example.notificationhub.data.entity.NotificationConfig
+import com.example.notificationhub.util.AppConstant
+import java.util.Calendar
 
+/**
+ * Screen composable showing schedule configuration UI.
+ *
+ * @param viewModel ViewModel to handle save and test notification actions
+ * @param modifier Optional modifier for layout customization
+ */
 @Composable
 fun ScheduleScreen(
     viewModel: ScheduleViewModel,
@@ -35,13 +43,21 @@ fun ScheduleScreen(
 
     LaunchedEffect(saveSuccess) {
         if (saveSuccess) {
-            Toast.makeText(context, "Notification saved successfully!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context,
+                context.getString(R.string.notification_saved_successfully),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
     LaunchedEffect(testSent) {
         if (testSent) {
-            Toast.makeText(context, "Test notification sent!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context,
+                context.getString(R.string.test_notification_sent),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -52,21 +68,49 @@ fun ScheduleScreen(
         onTest = { type, message ->
             viewModel.testNotification(type, message)
         },
+        onUpdateTime = { notification, newTime ->
+            viewModel.updateNotificationTime(notification, newTime)
+        },
         modifier = modifier
     )
 }
 
+/**
+ * Content composable displaying the form inputs and action buttons for scheduling notifications.
+ *
+ * @param onSave Callback invoked to save notification configuration
+ * @param onTest Callback invoked to send a test notification
+ * @param modifier Optional modifier for layout customization
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleScreenContent(
     onSave: (String, String, String, String, String) -> Unit = { _, _, _, _, _ -> },
     onTest: (String, String) -> Unit = { _, _ -> },
+    onUpdateTime: (notification: NotificationConfig, newTime: String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
-) {
-    var selectedType by remember { mutableStateOf("Daily Reminder") }
-    var selectedTime by remember { mutableStateOf("09:00") }
-    var selectedRepeat by remember { mutableStateOf("Daily") }
+)  {
+    var selectedType by remember { mutableStateOf(AppConstant.TYPE_DAILY_REMINDER) }
+    var selectedTime by remember { mutableStateOf(AppConstant.DEFAULT_TIME_DAILY) }
+    var selectedRepeat by remember { mutableStateOf(AppConstant.REPEAT_DAILY) }
     var message by remember { mutableStateOf("Your daily task is ready!") }
     var selectedDeepLink by remember { mutableStateOf("Open Home Screen") }
+    var showTimePicker by remember { mutableStateOf(false) }
+    var currentNotification by remember { mutableStateOf<com.example.notificationhub.data.entity.NotificationConfig?>(null) }
+
+    if (showTimePicker) {
+        TimePickerDialog(
+            onDismiss = { showTimePicker = false },
+            onConfirm = { hour, minute ->
+                val newTime = String.format("%02d:%02d", hour, minute)
+                showTimePicker = false
+                selectedTime = newTime
+                currentNotification?.let { notification ->
+                    onUpdateTime(notification, newTime)
+                }
+            }
+        )
+    }
 
     Column(
         modifier = modifier
@@ -84,18 +128,30 @@ fun ScheduleScreenContent(
                 FormField(label = "Notification Type") {
                     DropdownField(
                         value = selectedType,
-                        options = listOf("Daily Reminder", "Weekly Summary", "Special Offers", "Tips & Tricks"),
+                        options = listOf(AppConstant.TYPE_DAILY_REMINDER, "Weekly Summary", "Special Offers", "Tips & Tricks"),
                         onValueChange = { selectedType = it }
                     )
                 }
             }
 
-            // Time
+            // Time - Now with TimePicker, update currentNotification to a dummy or previously saved notification
             item {
                 FormField(label = "Time") {
-                    TimeField(
+                    TimePickerField(
                         value = selectedTime,
-                        onValueChange = { selectedTime = it }
+                        onClick = {
+                            // Set currentNotification to some instance, here we create a dummy notification for demo
+                            currentNotification = com.example.notificationhub.data.entity.NotificationConfig(
+                                id = "dummy_id",
+                                type = selectedType,
+                                time = selectedTime,
+                                repeatInterval = selectedRepeat,
+                                message = message,
+                                deepLink = selectedDeepLink,
+                                isEnabled = true
+                            )
+                            showTimePicker = true
+                        }
                     )
                 }
             }
@@ -105,7 +161,7 @@ fun ScheduleScreenContent(
                 FormField(label = "Repeat") {
                     DropdownField(
                         value = selectedRepeat,
-                        options = listOf("Daily", "Weekly", "Twice a week"),
+                        options = listOf(AppConstant.REPEAT_DAILY, "Weekly", "Twice a week"),
                         onValueChange = { selectedRepeat = it }
                     )
                 }
@@ -140,7 +196,7 @@ fun ScheduleScreenContent(
                 FormField(label = "Deep Link Action") {
                     DropdownField(
                         value = selectedDeepLink,
-                        options = listOf("Open Home Screen", "Open Analytics", "Open Schedule"),
+                        options = listOf("Open Notification Screen", "Open Analytics", "Open Schedule"),
                         onValueChange = { selectedDeepLink = it }
                     )
                 }
@@ -195,13 +251,20 @@ fun ScheduleScreenContent(
             item {
                 NotificationPreviewCard(
                     type = selectedType,
-                    message = message
+                    message = message,
+                    time = selectedTime
                 )
             }
         }
     }
 }
 
+/**
+ * Composable to show a label and content in a column for form fields.
+ *
+ * @param label Label text for the form field
+ * @param content Composable lambda for the field content
+ */
 @Composable
 fun FormField(
     label: String,
@@ -218,6 +281,13 @@ fun FormField(
     }
 }
 
+/**
+ * Dropdown field composable with options and a current value.
+ *
+ * @param value Current selected value
+ * @param options List of available options
+ * @param onValueChange Callback to notify on selection change
+ */
 @Composable
 fun DropdownField(
     value: String,
@@ -272,59 +342,133 @@ fun DropdownField(
     }
 }
 
+/**
+ * Read-only text field representing a time picker selector.
+ *
+ * @param value Current time string in HH:mm format
+ * @param onClick Callback when the field is clicked
+ */
 @Composable
-fun TimeField(
+fun TimePickerField(
     value: String,
-    onValueChange: (String) -> Unit
+    onClick: () -> Unit
 ) {
     OutlinedTextField(
         value = value,
-        onValueChange = onValueChange,
-        modifier = Modifier.fillMaxWidth(),
+        onValueChange = {},
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        readOnly = true,
+        enabled = false,
         trailingIcon = {
-            Icon(
-                imageVector = Icons.Default.AccessAlarm,
-                contentDescription = null,
-                tint = Color.White
-            )
+            IconButton(onClick = onClick) {
+                Icon(
+                    imageVector = Icons.Default.AccessAlarm,
+                    contentDescription = "Select Time",
+                    tint = Color.White
+                )
+            }
         },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = Color(0xFF2A2A2A),
-            unfocusedContainerColor = Color(0xFF2A2A2A),
-            focusedBorderColor = Color(0xFF00BCD4),
-            unfocusedBorderColor = Color(0xFF424242),
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            cursorColor = Color(0xFF00BCD4)
+            disabledContainerColor = Color(0xFF2A2A2A),
+            disabledBorderColor = Color(0xFF424242),
+            disabledTextColor = Color.White,
+            disabledTrailingIconColor = Color.White
         ),
         shape = RoundedCornerShape(12.dp)
     )
 }
 
+/**
+ * Dialog composable for selecting time (hour and minute).
+ *
+ * @param onDismiss Lambda called when dialog dismissed
+ * @param onConfirm Lambda called with selected hour and minute on confirmation
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimePickerDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (hour: Int, minute: Int) -> Unit
+) {
+    val calendar = Calendar.getInstance()
+    val timePickerState = rememberTimePickerState(
+        initialHour = calendar.get(Calendar.HOUR_OF_DAY),
+        initialMinute = calendar.get(Calendar.MINUTE),
+        is24Hour = true
+    )
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel", color = Color(0xFF00BCD4))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                onConfirm(timePickerState.hour, timePickerState.minute)
+            }) {
+                Text("OK", color = Color(0xFF00BCD4))
+            }
+        },
+        text = {
+            TimePicker(
+                state = timePickerState,
+                colors = TimePickerDefaults.colors(
+                    clockDialColor = Color(0xFF2A2A2A),
+                    selectorColor = Color(0xFF00BCD4),
+                    containerColor = Color(0xFF1A1A1A),
+                    timeSelectorSelectedContainerColor = Color(0xFF00BCD4),
+                    timeSelectorUnselectedContainerColor = Color(0xFF2A2A2A),
+                    timeSelectorSelectedContentColor = Color.Black,
+                    timeSelectorUnselectedContentColor = Color.White
+                )
+            )
+        },
+        containerColor = Color(0xFF1A1A1A)
+    )
+}
+
+/**
+ * Card composable displaying a preview of the notification with details.
+ *
+ * @param type Notification type label
+ * @param message Notification message content
+ * @param time Notification scheduled time
+ */
 @Composable
 fun NotificationPreviewCard(
     type: String,
-    message: String
+    message: String,
+    time: String = AppConstant.DEFAULT_TIME_DAILY
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF2A2A2A)
-        ),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2A2A)),
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, Color(0xFF424242).copy(alpha = 0.5f))
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "PREVIEW",
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.White.copy(alpha = 0.5f),
-                letterSpacing = 2.sp
-            )
+        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "PREVIEW",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White.copy(alpha = 0.5f),
+                    letterSpacing = 2.sp
+                )
+                Text(
+                    text = time,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color(0xFF00BCD4),
+                    fontWeight = FontWeight.Medium
+                )
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -344,7 +488,7 @@ fun NotificationPreviewCard(
                 )
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = if (message.isNotBlank()) message else "Your message will appear here...",
@@ -355,41 +499,40 @@ fun NotificationPreviewCard(
     }
 }
 
-// ============ PREVIEWS ============
+// ===== Previews =====
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
 @Composable
 fun DropdownFieldPreview() {
     MaterialTheme {
         DropdownField(
-            value = "Daily Reminder",
-            options = listOf("Daily Reminder", "Weekly Summary", "Special Offers"),
+            value = AppConstant.TYPE_DAILY_REMINDER,
+            options = listOf(AppConstant.TYPE_DAILY_REMINDER, "Weekly Summary", "Special Offers"),
             onValueChange = {}
         )
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
 @Composable
-fun TimeFieldPreview() {
+fun TimePickerFieldPreview() {
     MaterialTheme {
-        TimeField(
-            value = "09:00",
-            onValueChange = {}
+        TimePickerField(
+            value = AppConstant.DEFAULT_TIME_DAILY,
+            onClick = {}
         )
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
 @Composable
 fun NotificationPreviewCardPreview() {
     MaterialTheme {
-        Column(modifier = Modifier.background(Color(0xFF1A1A1A)).padding(16.dp)) {
-            NotificationPreviewCard(
-                type = "Daily Reminder",
-                message = "Your daily task is ready!"
-            )
-        }
+        NotificationPreviewCard(
+            type = AppConstant.TYPE_DAILY_REMINDER,
+            message = "Your daily task is ready!",
+            time = AppConstant.DEFAULT_TIME_DAILY
+        )
     }
 }
 
@@ -398,5 +541,17 @@ fun NotificationPreviewCardPreview() {
 fun ScheduleScreenPreview() {
     MaterialTheme {
         ScheduleScreenContent()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+@Composable
+fun TimePickerDialogPreview() {
+    MaterialTheme {
+        TimePickerDialog(
+            onDismiss = {},
+            onConfirm = { _, _ -> }
+        )
     }
 }

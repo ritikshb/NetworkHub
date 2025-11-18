@@ -3,13 +3,10 @@
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
-        android:name=".NotificationHubApplication"
+        android:name=".core.NotificationHubApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -30,17 +27,6 @@
                 <data android:scheme="notificationhub" />
             </intent-filter>
         </activity>
-
-        <!-- ✅ RECEIVER MUST BE HERE -->
-        <receiver
-            android:name=".worker.NotificationReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.example.notificationhub.NOTIFICATION_ALARM" />
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
 
     </application>
 </manifest>

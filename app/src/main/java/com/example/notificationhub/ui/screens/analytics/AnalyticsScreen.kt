@@ -21,8 +21,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.notificationhub.R
 
-// ==================== MAIN SCREEN ====================
-
+/**
+ * Main analytics screen that displays notification engagement metrics.
+ * Collects UI state from the ViewModel and displays it using AnalyticsScreenContent.
+ *
+ * @param viewModel ViewModel containing analytics data and business logic
+ * @param modifier Optional modifier for customizing the layout
+ */
 @Composable
 fun AnalyticsScreen(
     viewModel: AnalyticsViewModel,
@@ -37,6 +42,13 @@ fun AnalyticsScreen(
     )
 }
 
+/**
+ * Content layout for the analytics screen displaying engagement metrics and statistics.
+ *
+ * @param uiState Current UI state containing all analytics data
+ * @param viewModel Optional ViewModel for test functionality (can be null for previews)
+ * @param modifier Optional modifier for customizing the layout
+ */
 @Composable
 fun AnalyticsScreenContent(
     uiState: AnalyticsUiState,
@@ -54,7 +66,6 @@ fun AnalyticsScreenContent(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Engagement cards
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -76,32 +87,29 @@ fun AnalyticsScreenContent(
                 }
             }
 
-            // Engagement rate progress
             item {
                 EngagementRateCard(engagementRate = uiState.engagementRate)
             }
 
-            // Clicks by type
             item {
                 ClicksByTypeCard(clicksByType = uiState.clicksByType)
             }
 
-            // Best engagement time
             item {
                 BestEngagementTimeCard(time = uiState.bestEngagementTime)
             }
-
-            // Test buttons uncomment this block also for test functionality
-//            if (viewModel != null) {
-//                item {
-//                    Spacer(modifier = Modifier.height(8.dp))
-//                    TestAnalyticsCard(viewModel = viewModel)
-//                }
-//            }
         }
     }
 }
 
+/**
+ * Displays a single engagement metric in a colored card.
+ *
+ * @param value The metric value to display (e.g., "85%" or "124")
+ * @param label Description of the metric
+ * @param backgroundColor Background color of the card
+ * @param modifier Optional modifier for customizing the layout
+ */
 @Composable
 fun EngagementCard(
     value: String,
@@ -139,8 +147,11 @@ fun EngagementCard(
     }
 }
 
-// ==================== ENGAGEMENT RATE CARD ====================
-
+/**
+ * Displays the overall engagement rate as a progress bar with percentage indicators.
+ *
+ * @param engagementRate The engagement rate as a float between 0.0 and 1.0
+ */
 @Composable
 fun EngagementRateCard(engagementRate: Float) {
     Card(
@@ -166,7 +177,7 @@ fun EngagementRateCard(engagementRate: Float) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Engagement Rate",
+                    text = stringResource(R.string.engagement_rate),
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold
@@ -175,7 +186,6 @@ fun EngagementRateCard(engagementRate: Float) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Progress bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -236,8 +246,11 @@ fun EngagementRateCard(engagementRate: Float) {
     }
 }
 
-// ==================== CLICKS BY TYPE CARD ====================
-
+/**
+ * Displays click statistics grouped by notification type.
+ *
+ * @param clicksByType Map of notification types to their click counts
+ */
 @Composable
 fun ClicksByTypeCard(clicksByType: Map<String, Int>) {
     Card(
@@ -263,7 +276,7 @@ fun ClicksByTypeCard(clicksByType: Map<String, Int>) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Clicks by Type",
+                    text = stringResource(R.string.clicks_by_type),
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold
@@ -272,13 +285,20 @@ fun ClicksByTypeCard(clicksByType: Map<String, Int>) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            ClickTypeItem("Daily Reminder", clicksByType["Daily Reminder"] ?: 0, "📅")
-            ClickTypeItem("Weekly Summary", clicksByType["Weekly Summary"] ?: 0, "📊")
-            ClickTypeItem("Special Offers", clicksByType["Special Offers"] ?: 0, "🎁")
+            ClickTypeItem(stringResource(R.string.daily_reminder), clicksByType[stringResource(R.string.daily_reminder)] ?: 0, "📅")
+            ClickTypeItem(stringResource(R.string.weekly_summary), clicksByType[stringResource(R.string.weekly_summary)] ?: 0, "📊")
+            ClickTypeItem(stringResource(R.string.special_offers), clicksByType[stringResource(R.string.special_offers)] ?: 0, "🎁")
         }
     }
 }
 
+/**
+ * Displays a single row showing notification type, emoji icon, and click count.
+ *
+ * @param title Name of the notification type
+ * @param count Number of clicks for this type
+ * @param emoji Emoji icon representing the notification type
+ */
 @Composable
 fun ClickTypeItem(title: String, count: Int, emoji: String) {
     Row(
@@ -317,6 +337,11 @@ fun ClickTypeItem(title: String, count: Int, emoji: String) {
     }
 }
 
+/**
+ * Displays the time period with the highest user engagement.
+ *
+ * @param time Time period string (e.g., "2:00 - 3:00")
+ */
 @Composable
 fun BestEngagementTimeCard(time: String) {
     Card(
@@ -334,7 +359,7 @@ fun BestEngagementTimeCard(time: String) {
             horizontalArrangement = Arrangement.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Row{
+                Row {
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = null,
@@ -343,8 +368,8 @@ fun BestEngagementTimeCard(time: String) {
                     )
                     Spacer(modifier = Modifier.padding(2.dp))
                     Text(
-                        text = "Best Engagement Time",
-                        modifier = Modifier.padding(0.dp,2.dp,0.dp,0.dp),
+                        text = stringResource(R.string.best_engagement_time),
+                        modifier = Modifier.padding(0.dp, 2.dp, 0.dp, 0.dp),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.9f)
                     )
@@ -359,111 +384,6 @@ fun BestEngagementTimeCard(time: String) {
         }
     }
 }
-
-
-//if want to test db of analytics just un comment this code and use button and clear data you get how it works
-//@Composable
-//fun TestAnalyticsCard(viewModel: AnalyticsViewModel) {
-//    Card(
-//        modifier = Modifier.fillMaxWidth(),
-//        colors = CardDefaults.cardColors(
-//            containerColor = Color(0xFF2A2A2A)
-//        ),
-//        shape = RoundedCornerShape(12.dp),
-//        border = BorderStroke(1.dp, Color(0xFF424242))
-//    ) {
-//        Column(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(16.dp),
-//            verticalArrangement = Arrangement.spacedBy(8.dp)
-//        ) {
-//            Row(
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Icon(
-//                    imageVector = Icons.Default.Settings,
-//                    contentDescription = null,
-//                    tint = Color(0xFF00BCD4),
-//                    modifier = Modifier.size(20.dp)
-//                )
-//                Spacer(modifier = Modifier.width(8.dp))
-//                Text(
-//                    "Test Analytics",
-//                    style = MaterialTheme.typography.titleMedium,
-//                    color = Color.White,
-//                    fontWeight = FontWeight.SemiBold
-//                )
-//            }
-//
-//            Text(
-//                "Use these buttons to simulate analytics data",
-//                style = MaterialTheme.typography.bodySmall,
-//                color = Color.White.copy(alpha = 0.7f)
-//            )
-//
-//            Spacer(modifier = Modifier.height(4.dp))
-//
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.spacedBy(8.dp)
-//            ) {
-//                Button(
-//                    onClick = { viewModel.trackNotificationClick("Daily Reminder") },
-//                    modifier = Modifier.weight(1f),
-//                    colors = ButtonDefaults.buttonColors(
-//                        containerColor = Color(0xFF00897B)
-//                    )
-//                ) {
-//                    Icon(
-//                        imageVector = Icons.Default.Add,
-//                        contentDescription = null,
-//                        modifier = Modifier.size(16.dp)
-//                    )
-//                    Spacer(modifier = Modifier.width(4.dp))
-//                    Text("Click", fontSize = 12.sp)
-//                }
-//
-//                Button(
-//                    onClick = { viewModel.trackNotificationSent("Daily Reminder") },
-//                    modifier = Modifier.weight(1f),
-//                    colors = ButtonDefaults.buttonColors(
-//                        containerColor = Color(0xFF00897B)
-//                    )
-//                ) {
-//                    Icon(
-//                        imageVector = Icons.Default.Send,
-//                        contentDescription = null,
-//                        modifier = Modifier.size(16.dp)
-//                    )
-//                    Spacer(modifier = Modifier.width(4.dp))
-//                    Text("Sent", fontSize = 12.sp)
-//                }
-//            }
-//
-//            OutlinedButton(
-//                onClick = { viewModel.clearAnalytics() },
-//                modifier = Modifier.fillMaxWidth(),
-//                border = BorderStroke(1.dp, Color(0xFFB71C1C)),
-//                colors = ButtonDefaults.outlinedButtonColors(
-//                    contentColor = Color(0xFFB71C1C)
-//                )
-//            ) {
-//                Icon(
-//                    imageVector = Icons.Default.Delete,
-//                    contentDescription = null,
-//                    modifier = Modifier.size(16.dp)
-//                )
-//                Spacer(modifier = Modifier.width(8.dp))
-//                Text("Clear All Data")
-//            }
-//        }
-//    }
-//}
-
-
-
-// ==================== PREVIEW METHODS ====================
 
 @Preview(showBackground = true)
 @Composable

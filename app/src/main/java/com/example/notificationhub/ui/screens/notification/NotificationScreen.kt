@@ -1,9 +1,6 @@
 package com.example.notificationhub.ui.screens.notification
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,14 +11,23 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.notificationhub.R
 import com.example.notificationhub.data.entity.NotificationConfig
+import com.example.notificationhub.util.AppConstant
 
+/**
+ * Screen to display and manage notifications.
+ *
+ * @param viewModel ViewModel handling the notification logic
+ * @param modifier Modifier to customize layout
+ */
 @Composable
 fun NotificationsScreen(
     viewModel: NotificationsViewModel,
@@ -37,6 +43,14 @@ fun NotificationsScreen(
     )
 }
 
+/**
+ * Content composable rendering the list of notifications and a test notification button.
+ *
+ * @param notifications List of notifications to display
+ * @param onToggle Callback when a notification toggle is changed
+ * @param onTestNotification Callback for sending a test notification
+ * @param modifier Modifier to customize layout
+ */
 @Composable
 fun NotificationsScreenContent(
     notifications: List<NotificationConfig>,
@@ -49,7 +63,6 @@ fun NotificationsScreenContent(
             .fillMaxSize()
             .background(Color(0xFF1A1A1A))
     ) {
-        // Notification list
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -82,7 +95,7 @@ fun NotificationsScreenContent(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Send Test Notification",
+                        text = stringResource(R.string.send_test_notification),
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -91,6 +104,12 @@ fun NotificationsScreenContent(
     }
 }
 
+/**
+ * Composable representing a single notification item with toggle and info.
+ *
+ * @param notification Notification data to display
+ * @param onToggle Callback for toggling notification enabled/disabled state
+ */
 @Composable
 fun NotificationItem(
     notification: NotificationConfig,
@@ -109,7 +128,6 @@ fun NotificationItem(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icon
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -127,7 +145,6 @@ fun NotificationItem(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Content
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = notification.type,
@@ -163,7 +180,6 @@ fun NotificationItem(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Toggle Switch
             Switch(
                 checked = notification.isEnabled,
                 onCheckedChange = { onToggle() },
@@ -178,17 +194,19 @@ fun NotificationItem(
     }
 }
 
-// Helper functions
-private fun getIconEmoji(type: String): String {
-    return when (type) {
-        "Daily Reminder" -> "📅"
-        "Weekly Summary" -> "📊"
-        "Special Offers" -> "🎁"
-        "Tips & Tricks" -> "💡"
-        else -> "🔔"
-    }
+/**
+ * Provides an emoji icon for notification types for UI display.
+ *
+ * @param type Notification type string
+ * @return Emoji string representing the notification type
+ */
+private fun getIconEmoji(type: String): String = when(type) {
+    AppConstant.TYPE_DAILY_REMINDER -> "📅"
+    AppConstant.TYPE_WEEKLY_SUMMARY -> "📊"
+    AppConstant.TYPE_SPECIAL_OFFERS -> "🎁"
+    AppConstant.TYPE_TIPS_TRICKS -> "💡"
+    else -> "🔔"
 }
-
 
 @Preview(showBackground = true)
 @Composable
@@ -197,11 +215,11 @@ fun NotificationItemPreview() {
         NotificationItem(
             notification = NotificationConfig(
                 id = "1",
-                type = "Daily Reminder",
-                time = "09:00",
-                repeatInterval = "Every day",
-                message = "Don't forget to check your daily tasks!",
-                deepLink = "home",
+                type = AppConstant.TYPE_DAILY_REMINDER,
+                time = AppConstant.DEFAULT_TIME_DAILY,
+                repeatInterval = AppConstant.EVERY_DAY,
+                message = stringResource(R.string.don_t_forget_to_check_your_daily_tasks),
+                deepLink = "",
                 isEnabled = true
             ),
             onToggle = {}
@@ -216,11 +234,11 @@ fun NotificationItemDisabledPreview() {
         NotificationItem(
             notification = NotificationConfig(
                 id = "3",
-                type = "Special Offers",
+                type = AppConstant.TYPE_SPECIAL_OFFERS,
                 time = "Random times",
                 repeatInterval = "Disabled",
                 message = "Check out our latest deals and discounts",
-                deepLink = "home",
+                deepLink = "",
                 isEnabled = false
             ),
             onToggle = {}
@@ -237,37 +255,37 @@ fun NotificationsScreenPreview() {
                 NotificationConfig(
                     id = "1",
                     type = "Daily Reminder",
-                    time = "09:00",
-                    repeatInterval = "Every day",
+                    time = AppConstant.DEFAULT_TIME_DAILY,
+                    repeatInterval = AppConstant.EVERY_DAY,
                     message = "Don't forget to check your daily tasks!",
-                    deepLink = "home",
+                    deepLink = "",
                     isEnabled = true
                 ),
                 NotificationConfig(
                     id = "2",
-                    type = "Weekly Summary",
+                    type = AppConstant.TYPE_WEEKLY_SUMMARY,
                     time = "Monday 6:00",
                     repeatInterval = "Weekly",
                     message = "Your weekly progress report is ready",
-                    deepLink = "analytics",
+                    deepLink = "",
                     isEnabled = true
                 ),
                 NotificationConfig(
                     id = "3",
-                    type = "Special Offers",
+                    type = AppConstant.TYPE_SPECIAL_OFFERS,
                     time = "Random times",
                     repeatInterval = "Disabled",
                     message = "Check out our latest deals and discounts",
-                    deepLink = "home",
+                    deepLink = "",
                     isEnabled = false
                 ),
                 NotificationConfig(
                     id = "4",
-                    type = "Tips & Tricks",
+                    type = AppConstant.TYPE_TIPS_TRICKS,
                     time = "3:00",
                     repeatInterval = "Twice a week",
                     message = "Learn something new with our pro tips",
-                    deepLink = "home",
+                    deepLink = "",
                     isEnabled = false
                 )
             ),
