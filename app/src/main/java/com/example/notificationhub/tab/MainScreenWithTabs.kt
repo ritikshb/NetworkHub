@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +23,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.notificationhub.R
 import com.example.notificationhub.ui.navigation.AppNavHost
 import com.example.notificationhub.ui.screens.analytics.AnalyticsViewModel
+import com.example.notificationhub.ui.screens.notification.NotificationPermissionDialog
 import com.example.notificationhub.ui.screens.notification.NotificationsViewModel
 import com.example.notificationhub.ui.screens.schedule.ScheduleViewModel
 
@@ -54,6 +57,24 @@ fun MainScreenWithTabs(
         Destination.AnalyticsScreen.route -> 2
         else -> 0
     }
+
+    val showDialog by notificationsViewModel.showPermissionDialog.collectAsState()
+
+    LaunchedEffect(Unit) {
+        notificationsViewModel.checkNotificationPermission()
+    }
+
+    if (showDialog) {
+        NotificationPermissionDialog(
+            onOpenSettings = {
+                notificationsViewModel.dismissPermissionDialog()
+            },
+            onDismiss = {
+                notificationsViewModel.dismissPermissionDialog()
+            }
+        )
+    }
+
 
     Column(modifier = modifier.systemBarsPadding()) {
         AppHeader()

@@ -1,5 +1,7 @@
 package com.example.notificationhub.ui.screens.notification
 
+import android.content.Intent
+import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -207,6 +210,41 @@ private fun getIconEmoji(type: String): String = when(type) {
     AppConstant.TYPE_TIPS_TRICKS -> "💡"
     else -> "🔔"
 }
+
+
+@Composable
+fun NotificationPermissionDialog(
+        onOpenSettings: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Enable Notifications") },
+        text = {
+            Text("Notifications are disabled. Please enable notifications in the app settings to receive alerts.")
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(intent)
+                onOpenSettings()
+            }) {
+                Text("Open Settings")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
 
 @Preview(showBackground = true)
 @Composable

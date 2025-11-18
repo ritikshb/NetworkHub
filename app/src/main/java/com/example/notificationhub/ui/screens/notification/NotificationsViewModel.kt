@@ -1,6 +1,7 @@
 package com.example.notificationhub.ui.screens.notification
 
 import android.app.Application
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notificationhub.data.entity.NotificationConfig
@@ -26,6 +27,8 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
 
     private val _notifications = MutableStateFlow<List<NotificationConfig>>(emptyList())
     val notifications: StateFlow<List<NotificationConfig>> = _notifications.asStateFlow()
+    private val _showPermissionDialog = MutableStateFlow(false)
+    val showPermissionDialog: StateFlow<Boolean> = _showPermissionDialog
 
     init {
         loadNotifications()
@@ -122,5 +125,16 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
                 e.printStackTrace()
             }
         }
+    }
+
+    fun checkNotificationPermission() {
+        viewModelScope.launch {
+            val enabled = NotificationManagerCompat.from(getApplication()).areNotificationsEnabled()
+            _showPermissionDialog.value = !enabled
+        }
+    }
+
+    fun dismissPermissionDialog() {
+        _showPermissionDialog.value = false
     }
 }
