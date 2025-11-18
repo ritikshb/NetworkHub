@@ -1,132 +1,117 @@
 package com.example.notificationhub.activity
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.notificationhub.core.NotificationHubApp
-import com.example.notificationhub.data.entity.AnalyticsData
-import com.example.notificationhub.data.local.database.AppDatabase
 import com.example.notificationhub.ui.theme.NotificationHubTheme
 import com.example.notificationhub.util.AppConstant
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
- * Main activity that serves as the entry point for the Notification Hub application.
- * Handles notification permissions, deep linking, and analytics tracking.
+ * Main activity of the Notification Hub app.
+ * Handles deep link navigation from notifications.
  */
 class MainActivity : ComponentActivity() {
 
-    /**
-     * Launcher for requesting POST_NOTIFICATIONS permission on Android 13+.
-     * Handles the result of the permission request.
-     */
-    private val requestNotificationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        // Permission result is handled automatically by the system
-        // App will be able to show notifications if granted
-    }
+    private lateinit var navController: NavHostController
+    private lateinit var deepLinkHandled: MutableState<Boolean>
 
-    /**
-     * Called when the activity is first created.
-     * Initializes the UI and requests necessary permissions.
-     */
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requestNotificationPermission()
-
-        handleDeepLinkIntent(intent)
-
         setContent {
             NotificationHubTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    NotificationHubApp()
+                navController = rememberNavController()
+                deepLinkHandled = remember { mutableStateOf(false) }
+
+                LaunchedEffect(Unit) {
+                    if (!deepLinkHandled.value) {
+                        handleDeepLink(intent, navController)
+                        deepLinkHandled.value = true
+                    }
                 }
+
+                NotificationHubApp(navController = navController)
             }
         }
     }
 
-    /**
-     * Called when a new intent is received while the activity is already running.
-     * Handles deep links when the app is in the foreground or background.
-     */
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         setIntent(intent)
-        handleDeepLinkIntent(intent)
+        handleDeepLink(intent, navController)
+        deepLinkHandled.value = true
     }
 
     /**
-     * Processes deep link intents from notification clicks.
-     * Extracts the notification type and tracks the click event.
+     * Handles deep link from notification intent and navigates to the appropriate screen.
      *
-     * @param intent The intent containing the deep link data
+     * @param intent Intent containing the deep link data
+     * @param navController NavController for screen navigation
      */
-    private fun handleDeepLinkIntent(intent: Intent?) {
+    private fun handleDeepLink(
+        intent: Intent?,
+        navController: NavHostController
+    ) {
         intent?.data?.let { uri ->
-            val notificationType = uri.getQueryParameter("type") ?: "Unknown"
-            trackNotificationClick(notificationType)
+            when (uri.host) {
+                "notifications" -> {
+                    Log.d("DeeplinkText", "handleDeepLink: ${uri.host}")
+                    navController.navigate(AppConstant.NOTIFICATION_SCREEN)
+                }
+                "analytics" -> {
+                    Log.d("DeeplinkText", "handleDeepLink: ${uri.host}")
+                    navController.navigate(AppConstant.ANALYTICS_SCREEN)
+                }
+                "schedule" -> {
+                    Log.d("DeeplinkText", "handleDeepLink: ${uri.host}")
+                    navController.navigate(AppConstant.SCHEDULE_SCREEN)
+                }
+                else ->{
+                    Log.d("DeeplinkText", "handleDeepLink: ${uri.host}")
+                    navController.navigate(AppConstant.NOTIFICATION_SCREEN)
+                }
+            }
+
+            trackNotificationClick(uri)
         }
     }
 
     /**
-     * Records a notification click event in the analytics database.
-     * Runs on the IO dispatcher to avoid blocking the main thread.
+     * Tracks notification click event for analytics.
      *
-     * @param notificationType The type of notification that was clicked
+     * @param uri Deep link URI containing notification type
      */
-    private fun trackNotificationClick(notificationType: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
+    private fun trackNotificationClick(uri: Uri) {
+        val notificationType = uri.getQueryParameter("type") ?: return
+
+        // Track click in database
+        kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             try {
-                val dao = AppDatabase.getDatabase(this@MainActivity).analyticsDao()
+                val dao = com.example.notificationhub.data.local.database.AppDatabase
+                    .getDatabase(applicationContext)
+                    .analyticsDao()
+
                 dao.insertAnalytic(
-                    AnalyticsData(
+                    com.example.notificationhub.data.entity.AnalyticsData(
                         notificationType = notificationType,
                         timestamp = System.currentTimeMillis(),
-                        action = AppConstant.CLICKED
+                        action = "clicked"
                     )
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
-            }
-        }
-    }
-
-    /**
-     * Requests POST_NOTIFICATIONS permission for Android 13 (API 33) and above.
-     * For Android 12 and below, notification permission is granted by default.
-     */
-    private fun requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            when {
-                ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED -> {
-                    // No action needed
-                }
-                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
-                    requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                }
-                else -> {
-                    requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                }
             }
         }
     }

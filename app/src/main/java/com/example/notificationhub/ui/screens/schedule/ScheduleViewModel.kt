@@ -44,7 +44,7 @@ class ScheduleViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             try {
                 val deepLinkValue = when (deepLink) {
-                    "Open Home Screen" -> "home"
+                    "Open Home Screen" -> "notifications"
                     "Open Analytics" -> "analytics"
                     "Open Schedule" -> "schedule"
                     else -> "home"
