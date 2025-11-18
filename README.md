@@ -24,7 +24,7 @@ Notification Hub is an Android application that enables users to schedule custom
 ## Getting Started
 
 Clone the repository:  
-`git clone https://github.com/yourusername/notificationhub.git`  
+`git clone https://github.com/ritikshb/notificationhub.git`  
 
 Open the project in Android Studio.
 
